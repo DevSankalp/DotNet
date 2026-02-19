@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="h-screen flex items-center justify-center font-sans bg-gradient-to-br from-[#1e3c72] to-[#2a5298]">
+
+    <!-- Login Card -->
+    <div class="card bg-white w-96 p-10 rounded-xl shadow-2xl text-center" id="loginCard">
+        <h2 class="mb-2 text-4xl font-bold text-blue-700">Sign in</h2>
+        <div class="subtitle text-sm text-gray-500 mb-6">Access your secure dashboard</div>
+
+        <div class="input-group mb-4 text-left">
+            <label class="block text-sm text-gray-700 mb-1">Username</label>
+            <input type="text" id="username"
+                class="w-full p-3 rounded-lg border border-gray-300 text-sm focus:border-blue-700 focus:ring-2 focus:ring-blue-600/15 outline-none">
+        </div>
+
+        <div class="input-group mb-4 text-left">
+            <label class="block text-sm text-gray-700 mb-1">Password</label>
+            <div class="password-wrapper relative">
+                <input type="password" id="password"
+                    class="w-full p-3 rounded-lg border border-gray-300 text-sm focus:border-blue-700 focus:ring-2 focus:ring-blue-600/15 outline-none">
+                <span class="toggle-password absolute right-3 top-3 text-xs text-blue-700 cursor-pointer"
+                    onclick="togglePassword()">Show</span>
+            </div>
+        </div>
+
+        <button onclick="login()" id="loginBtn"
+            class="w-full p-3 rounded-lg bg-blue-700 text-white font-semibold transition hover:bg-blue-800 disabled:bg-gray-400 disabled:cursor-not-allowed">Login</button>
+
+        <div class="message mt-4 text-xs min-h-[18px] text-red-500" id="message"></div>
+        <div class="attempts text-xs mt-2 text-gray-500" id="attemptsInfo"></div>
+        <div class="lock-timer text-xs mt-1 text-yellow-500" id="timer"></div>
+    </div>
+
+    <!-- Welcome Screen -->
+    <div class="card hidden bg-white w-96 p-10 rounded-xl shadow-2xl text-center" id="welcomeScreen">
+        <div class="logo text-4xl mb-4">🏢</div>
+        <h2 class="mb-2 text-gray-800">Welcome</h2>
+        <p id="welcomeMessage"></p>
+        <br>
+        <button class="logout-btn w-full p-3 rounded-lg bg-red-500 text-white font-semibold transition hover:bg-red-600"
+            onclick="logout()">Logout</button>
+    </div>
+
+    <script>
+        const cu = "admin", cp = "12345", max = 3, lockDur = 30 * 60 * 1e3;
+        let countdown; const u = document.getElementById("username"), p = document.getElementById("password"), m = document.getElementById("message"), a = document.getElementById("attemptsInfo"), t = document.getElementById("timer"), b = document.getElementById("loginBtn");
+        document.addEventListener("keydown", e => e.key === "Enter" && login());
+        function togglePassword() { p.type = p.type === "password" ? "text" : "password"; document.querySelector(".toggle-password").textContent = p.type === "password" ? "Show" : "Hide"; }
+        function startCountdown(l) { clearInterval(countdown); countdown = setInterval(() => { const r = l - Date.now(); if (r <= 0) { clearInterval(countdown); localStorage.removeItem("lockTime"); localStorage.removeItem("attempts"); b.disabled = false; m.textContent = a.textContent = t.textContent = ""; return; } const mm = Math.floor(r / 6e4), ss = Math.floor(r % 6e4 / 1e3); t.textContent = `Account locked. Try again in ${mm}m ${ss}s`; }, 1e3); }
+        function checkLock() { const l = localStorage.getItem("lockTime"); if (l && Date.now() < l) { b.disabled = true; m.textContent = "Too many failed attempts."; startCountdown(l); } else { localStorage.removeItem("lockTime"); localStorage.removeItem("attempts"); } }
+        function login() { let at = +localStorage.getItem("attempts") || 0; if (u.value === cu && p.value === cp) { localStorage.removeItem("attempts"); m.textContent = ""; showWelcome(u.value); } else { at++; localStorage.setItem("attempts", at); if (at > max) { const lt = Date.now() + lockDur; localStorage.setItem("lockTime", lt); b.disabled = true; m.textContent = "Account locked for 30 minutes."; startCountdown(lt); a.textContent = `Attempts left: ${max - at + 1}`; } else { m.textContent = "Invalid username or password."; a.textContent = `Attempts left: ${max - at + 1}`; } } }
+        function showWelcome(n) { document.getElementById("loginCard").style.display = "none"; document.getElementById("welcomeScreen").style.display = "block"; document.getElementById("welcomeMessage").textContent = `Hello ${n}, you have successfully logged into your secure dashboard.`; }
+        function logout() { document.getElementById("welcomeScreen").style.display = "none"; document.getElementById("loginCard").style.display = "block"; }
+        window.onload = checkLock;
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Calc</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@latest/dist/tailwind.min.css" rel="stylesheet">
+</head>
+
+<body class="h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
+    <div class="bg-white p-8 rounded-lg shadow-lg w-80">
+        <h2 class="text-center text-blue-800 mb-4">Calculator</h2><input id="n1" type="number"
+            placeholder="First Number" class="w-full p-2 mb-2 border rounded" /><input id="n2" type="number"
+            placeholder="Second Number" class="w-full p-2 mb-2 border rounded" /><select id="op"
+            class="w-full p-2 mb-2 border rounded">
+            <option value="+">Addition +</option>
+            <option value="-">Subtraction -</option>
+            <option value="*">Multiplication *</option>
+            <option value="/">Division /</option>
+        </select><button onclick="c()" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">=</button>
+        <div id="r" class="mt-4 text-center text-lg"></div>
+    </div>
+    <script>function c() { let a = +n1.value, b = +n2.value, o = op.value; if (isNaN(a) || isNaN(b)) return r.innerText = "Nums?"; if (o == "/" && b == 0) return r.innerText = "No 0"; r.innerText = "Result: " + eval(a + o + b) }</script>
+</body>
+
+</html>
+
+</body>
+
+</html>
